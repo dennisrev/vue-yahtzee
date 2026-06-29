@@ -4,23 +4,48 @@ import { computed, defineModel } from 'vue';
 
 const dice = defineModel();
 
-console.log(dice.value);
+const count = computed(() => {
+    const countHelp = Array(6).fill(0);
+    for (let key in dice.value) {
+        countHelp[dice.value[key]-1]++;
+    };
+    return countHelp;
+});
 
+const isXOfAKind = computed(() => {
+    const isXOfAKindHelp = Array(3).fill(false);
+    for (let x = 3; x <= 5; x++) {
+        isXOfAKindHelp[x-3] = count.value.some(cnt => cnt >=x);
+    };
+    return isXOfAKindHelp;
+})
 
-const amounts = computed(() => {
-    let count = [0,0,0,0,0,0];
-    for (let i = 0; i < dice.value.length; i++) {
-        count[dice.value[i]-1]++;
+const isFullHouse = computed(() => {
+    return count.value.includes(3) && count.value.includes(2);
+});
+
+const isBigStreet = computed(() => {
+
+    const sortedDice = dice.value.sort(); 
+    const uniqueDice = [];
+    sortedDice.forEach( (diceValue) => {
+        if ( uniqueDice.indexOf(diceValue) == -1 ) {
+            uniqueDice.push(diceValue);
+        }
+    });
+    const streetLength = 0;
+    const maxStreetLength = 0;
+    for (let i = 1; i <= uniqueDice.length; i++) {
+        if (uniqueDice[i] - uniqueDice[i-1] == 1 ){
+            streetLength++;
+        } else {
+            maxStreetLength = streetLength;
+            streetLength = 0;
+        };
     }
-    return count;
+    return maxStreetLength == 5;
+
 });
-
-const numbers = computed( (x) => {
-    return count.value[x+1] * x;
-});
-
-console.log(amounts.value);
-
 
 const sumDice = computed(() => {
     return dice.value.reduce(getSum);
@@ -29,8 +54,6 @@ const sumDice = computed(() => {
 function getSum(sum, value) { 
     return sum + value;
 };
-
-//console.log(dice.value[0]);
 
 </script>
 
@@ -48,16 +71,56 @@ function getSum(sum, value) {
             <th>Punten</th>
         </tr>
         <tr>
-            <td>Enen</td>
-            <td> {{ amounts[0] }}</td>
+            <td>Eenen</td>
+            <td> {{ count[0] }}</td>
         </tr>
         <tr>
-            <td>Enen</td>
-            <td> {{ numbers[1] }}</td>
+            <td>Tweeën</td>
+            <td> {{ count[1] * 2 }}</td>
+        </tr>
+        <tr>
+            <td>Drieën</td>
+            <td> {{ count[2] * 3 }}</td>
+        </tr>
+        <tr>
+            <td>Vieren</td>
+            <td> {{ count[3] * 4 }}</td>
+        </tr>
+        <tr>
+            <td>Vijfen</td>
+            <td> {{ count[4] * 5 }}</td>
+        </tr>
+        <tr>
+            <td>Zessen</td>
+            <td> {{ count[5] * 6 }}</td>
+        </tr>
+        <tr>
+            <td>Drie gelijke</td>
+            <td> {{ isXOfAKind[0] ? sumDice : 0 }}</td>
+        </tr>
+        <tr>
+            <td>Vier gelijke</td>
+            <td> {{ isXOfAKind[1] ? sumDice : 0 }}</td>
+        </tr>
+        <tr>
+            <td>Kleine Straat</td>
+            <td> {{ 0 }}</td>
+        </tr>
+        <tr>
+            <td>Grote Straat</td>
+            <td> {{ isBigStreet ? 40 : 0 }}</td>
+        </tr>
+        <tr>
+            <td>FullHouse</td>
+            <td> {{ isFullHouse ? 25 : 0 }}</td>
         </tr>
         <tr>
             <td>Kans</td>
             <td> {{ sumDice }}</td>
+        </tr>
+        <tr>
+            <td>Yahtzee</td>
+            <td> {{ isXOfAKind[2] ? 50 : 0 }}</td>
         </tr>
       </tbody>
     </table>
