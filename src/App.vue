@@ -4,7 +4,7 @@ import ScoreTable from './components/ScoreTable.vue'
 
 import { ref } from 'vue';
 
-const dice = ref([2,2,3,3,3]);
+const dice = ref([1,2,3,4,5]);
 
 </script>
 

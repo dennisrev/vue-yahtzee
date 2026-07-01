@@ -12,39 +12,46 @@ const count = computed(() => {
     return countHelp;
 });
 
+// functie die in computeds wordt herhaald 
+
+//const xOfAKind = (x) => {
+//
+//}
+
+//const threeOfAkind = computed(() => adsdasdas(3) ? sumf : 0)
+//const threeOfAkind = computed(() => adsdasdas(4) ? sumf : 0)
+//const threeOfAkind = computed(() => adsdasdas(5) ? sumf : 0)
+
 const isXOfAKind = computed(() => {
-    const isXOfAKindHelp = Array(3).fill(false);
-    for (let x = 3; x <= 5; x++) {
-        isXOfAKindHelp[x-3] = count.value.some(cnt => cnt >=x);
+    const xSameDices = [];
+    for (let xSame = 3; xSame <= 5; xSame++) {
+        xSameDices.push(count.value.some(cnt => cnt >=xSame));  
     };
-    return isXOfAKindHelp;
-})
+    return xSameDices;
+});
 
 const isFullHouse = computed(() => {
     return count.value.includes(3) && count.value.includes(2);
 });
 
-const isBigStreet = computed(() => {
+const isStreet = computed(() => {
+    const streets = [];
 
-    const sortedDice = dice.value.sort(); 
-    const uniqueDice = [];
-    sortedDice.forEach( (diceValue) => {
-        if ( uniqueDice.indexOf(diceValue) == -1 ) {
-            uniqueDice.push(diceValue);
-        }
-    });
-    const streetLength = 0;
-    const maxStreetLength = 0;
-    for (let i = 1; i <= uniqueDice.length; i++) {
-        if (uniqueDice[i] - uniqueDice[i-1] == 1 ){
-            streetLength++;
-        } else {
-            maxStreetLength = streetLength;
-            streetLength = 0;
-        };
+    const uniqueDice = [...new Set(Object.values(dice.value))];
+    const diceLength = uniqueDice.length;
+    
+    if ( ( diceLength == 4 && uniqueDice[diceLength-1] - uniqueDice[0] == 3 ) || 
+             ( diceLength == 5 && ( uniqueDice[1] == 3 || uniqueDice[diceLength-2] == 4 )  ) ) {
+        streets.push(true);
+    } else {
+        streets.push(false);
     }
-    return maxStreetLength == 5;
-
+    if ( diceLength == 5 && uniqueDice[diceLength-1] - uniqueDice[0] == 4 ) {
+        streets.push(true);
+    } else {
+        streets.push(false);
+    }
+    return streets;
 });
 
 const sumDice = computed(() => {
@@ -70,29 +77,9 @@ function getSum(sum, value) {
             <th>Combinatie</th>
             <th>Punten</th>
         </tr>
-        <tr>
-            <td>Eenen</td>
-            <td> {{ count[0] }}</td>
-        </tr>
-        <tr>
-            <td>Tweeën</td>
-            <td> {{ count[1] * 2 }}</td>
-        </tr>
-        <tr>
-            <td>Drieën</td>
-            <td> {{ count[2] * 3 }}</td>
-        </tr>
-        <tr>
-            <td>Vieren</td>
-            <td> {{ count[3] * 4 }}</td>
-        </tr>
-        <tr>
-            <td>Vijfen</td>
-            <td> {{ count[4] * 5 }}</td>
-        </tr>
-        <tr>
-            <td>Zessen</td>
-            <td> {{ count[5] * 6 }}</td>
+        <tr v-for="(countValue, index) in count" :key="index">
+            <td> {{ index + 1 }}</td>
+            <td> {{ countValue * (index+1) }}</td>
         </tr>
         <tr>
             <td>Drie gelijke</td>
@@ -104,11 +91,11 @@ function getSum(sum, value) {
         </tr>
         <tr>
             <td>Kleine Straat</td>
-            <td> {{ 0 }}</td>
+            <td> {{ isStreet[0] ? 30 : 0 }}</td>
         </tr>
         <tr>
             <td>Grote Straat</td>
-            <td> {{ isBigStreet ? 40 : 0 }}</td>
+            <td> {{ isStreet[1] ? 40 : 0 }}</td>
         </tr>
         <tr>
             <td>FullHouse</td>

@@ -4,13 +4,15 @@ import { defineModel } from 'vue';
 
 const dice = defineModel();
 
-const rolls = 5;
+const ROLLS = 5;
 
 function rollDices() {
-    for (let i=0; i < rolls; i++) {
-        dice.value[i] = 1 + Math.floor(Math.random() * 6);
-    }
-}
+  dice.value.length = 0;
+  for (let i=0; i < ROLLS; i++) {
+    const roll = 1 + Math.floor(Math.random() * 6);
+    dice.value.push(roll);
+  };
+};
 
 </script>
 
@@ -20,12 +22,15 @@ function rollDices() {
     <button @click="rollDices">Gooien!</button>
 
     <table align="center">
-      <thead>
-        De vijf gegooide dobbelstenen:
+      <thead colsspan>
+        <tr>
+          <td colspan="5">De vijf gegooide dobbelstenen:</td>
+        </tr>
+        
       </thead>
       <tbody>
         <tr>
-          {{dice[0] }} {{ dice[1] }} {{ dice[2] }} {{ dice[3] }} {{ dice[4] }} 
+          <td v-for="(diceValue, index) in dice" :key="index"> {{ diceValue }} </td>
         </tr>
       </tbody>
     </table>
