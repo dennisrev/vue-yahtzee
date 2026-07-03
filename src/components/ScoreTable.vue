@@ -5,62 +5,31 @@ import { computed, defineModel } from 'vue';
 const dice = defineModel();
 
 const count = computed(() => {
-    const countHelp = Array(6).fill(0);
-    for (let key in dice.value) {
-        countHelp[dice.value[key]-1]++;
-    };
-    return countHelp;
+   const countHelp = Array(6).fill(0);
+   for (let diceNumber in dice.value) {
+       countHelp[dice.value[diceNumber]-1]++;
+   };
+   return countHelp;
 });
 
-// functie die in computeds wordt herhaald 
+const isXOfAKind = xSameDices => count.value.some(cnt => cnt >= xSameDices);
 
-//const xOfAKind = (x) => {
-//
-//}
+const threeOfAKind = computed(() => isXOfAKind(3) ? sumDice : 0);
 
-//const threeOfAkind = computed(() => adsdasdas(3) ? sumf : 0)
-//const threeOfAkind = computed(() => adsdasdas(4) ? sumf : 0)
-//const threeOfAkind = computed(() => adsdasdas(5) ? sumf : 0)
+const fourOfAKind = computed(() =>  isXOfAKind(4) ? sumDice : 0);
 
-const isXOfAKind = computed(() => {
-    const xSameDices = [];
-    for (let xSame = 3; xSame <= 5; xSame++) {
-        xSameDices.push(count.value.some(cnt => cnt >=xSame));  
-    };
-    return xSameDices;
-});
+const yahtzee = computed(() => isXOfAKind(5) ? 50 : 0);
 
-const isFullHouse = computed(() => {
-    return count.value.includes(3) && count.value.includes(2);
-});
+const fullHouse = computed(() => count.value.includes(3) && count.value.includes(2) ? 25 : 0)
 
-const isStreet = computed(() => {
-    const streets = [];
+const BIGSTREETS = ["12345", "23456"];
+const SMALLSTREETS = ["1234","12346", "2345", "3456", "13456"].concat(BIGSTREETS);
+const uniqueDice = computed(() => [...new Set(dice.value)].sort());
 
-    const uniqueDice = [...new Set(Object.values(dice.value))];
-    const diceLength = uniqueDice.length;
-    
-    if ( ( diceLength == 4 && uniqueDice[diceLength-1] - uniqueDice[0] == 3 ) || 
-             ( diceLength == 5 && ( uniqueDice[1] == 3 || uniqueDice[diceLength-2] == 4 )  ) ) {
-        streets.push(true);
-    } else {
-        streets.push(false);
-    }
-    if ( diceLength == 5 && uniqueDice[diceLength-1] - uniqueDice[0] == 4 ) {
-        streets.push(true);
-    } else {
-        streets.push(false);
-    }
-    return streets;
-});
+const smallStreet = computed(() => SMALLSTREETS.includes(uniqueDice.value.join("")) ? 30 : 0);
+const bigStreet = computed(() => BIGSTREETS.includes(uniqueDice.value.join("")) ? 40 : 0);
 
-const sumDice = computed(() => {
-    return dice.value.reduce(getSum);
-});
-
-function getSum(sum, value) { 
-    return sum + value;
-};
+const sumDice = computed(() => dice.value.reduce((sum, value) => sum + value, 0));
 
 </script>
 
@@ -79,27 +48,27 @@ function getSum(sum, value) {
         </tr>
         <tr v-for="(countValue, index) in count" :key="index">
             <td> {{ index + 1 }}</td>
-            <td> {{ countValue * (index+1) }}</td>
+            <td> {{ countValue * (index + 1) }}</td>
         </tr>
         <tr>
             <td>Drie gelijke</td>
-            <td> {{ isXOfAKind[0] ? sumDice : 0 }}</td>
+            <td> {{ threeOfAKind }}</td>
         </tr>
         <tr>
             <td>Vier gelijke</td>
-            <td> {{ isXOfAKind[1] ? sumDice : 0 }}</td>
+            <td> {{ fourOfAKind }}</td>
         </tr>
         <tr>
             <td>Kleine Straat</td>
-            <td> {{ isStreet[0] ? 30 : 0 }}</td>
+            <td> {{ smallStreet }}</td>
         </tr>
         <tr>
             <td>Grote Straat</td>
-            <td> {{ isStreet[1] ? 40 : 0 }}</td>
+            <td> {{ bigStreet }}</td>
         </tr>
         <tr>
             <td>FullHouse</td>
-            <td> {{ isFullHouse ? 25 : 0 }}</td>
+            <td> {{ fullHouse }}</td>
         </tr>
         <tr>
             <td>Kans</td>
@@ -107,7 +76,7 @@ function getSum(sum, value) {
         </tr>
         <tr>
             <td>Yahtzee</td>
-            <td> {{ isXOfAKind[2] ? 50 : 0 }}</td>
+            <td> {{ yahtzee }}</td>
         </tr>
       </tbody>
     </table>
