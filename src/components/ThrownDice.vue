@@ -6,20 +6,20 @@ const dice = defineModel();
 
 const ROLLS = 5;
 
-function rollDices() {
-  dice.value.length = 0;
-  for (let i=0; i < ROLLS; i++) {
-    const roll = 1 + Math.floor(Math.random() * 6);
-    dice.value.push(roll);
-  };
-};
+// function rollDices() {
+//   dice.value.length = 0;
+//   for (let i=0; i < ROLLS; i++) {
+//     const roll = 1 + Math.floor(Math.random() * 6);
+//     dice.value.push(roll);
+//   };
+// };
 
 </script>
 
 <template>
 
 <div>
-    <button @click="rollDices">Gooien!</button>
+    <!-- <button @click="rollDices">Gooien!</button> -->
 
     <table align="center">
       <thead colsspan>
